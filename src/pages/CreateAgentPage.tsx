@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate, useParams, Link } from 'react-router-dom';
 import { Bot, Brain, Command, Cpu, MessageSquare, Rocket, Send, Search, ArrowRight, Wallet } from 'lucide-react';
 import Navigation from "../component/Navigation";
-import { useAccount, useWriteContract } from 'wagmi';
+import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 
 import  abi  from './../abi/abi.json'
  
@@ -16,6 +16,7 @@ interface Agent {
   tokenName: string;
   tokenSymbol: string;
   tokenSupply: string;
+  tokenAddress?: string;
 }
 
 function CreateAgentPage() {
@@ -28,7 +29,9 @@ function CreateAgentPage() {
     instructions: '',
     tokenName: '',
     tokenSymbol: '',
-    tokenSupply: ''
+    tokenSupply: '',
+    tokenAddress: ''
+
   });
   const { address, isConnected } = useAccount();
   const [errors, setErrors] = React.useState<Record<string, string>>({});

@@ -18,7 +18,7 @@ function HomePage() {
             <Rocket className="w-16 h-16 text-indigo-600" />
           </div>
           <h1 className="text-5xl font-bold mb-6 leading-[1.4] bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">
-    AI Agent Launchpad
+          De-Gift.Agent Launchpad 
   </h1>
   
           
@@ -98,7 +98,7 @@ function HomePage() {
   
         {/* Footer */}
         <footer className="container mx-auto px-4 py-8 text-center text-gray-600">
-          <p>© 2025 AI Agent Launchpad. All rights reserved.</p>
+          <p>© 2025 De-Gift.Agent Launchpad. All rights reserved.</p>
         </footer>
       </div>
     );

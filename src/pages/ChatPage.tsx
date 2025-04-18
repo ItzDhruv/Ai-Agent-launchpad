@@ -20,6 +20,7 @@ interface Agent {
     tokenName: string;
     tokenSymbol: string;
     tokenSupply: string;
+    tokenAddress?: string;
 }
 
 interface TradeModalProps {
@@ -319,7 +320,9 @@ function ChatPage() {
                                 <span className="text-sm px-2 py-1 bg-indigo-100 text-indigo-700 rounded-lg font-medium">
                                     {agent.tokenSymbol}
                                 </span>
+                                
                             </div>
+                            <h1>Token address : {agent.tokenAddress}</h1> <br />
                             
                             <div className="flex items-end gap-2 mb-2">
                                 <span className="text-3xl font-bold text-gray-900">${tokenData.price}</span>
@@ -345,6 +348,7 @@ function ChatPage() {
                                     ></div>
                                 ))}
                             </div>
+                            
                             
                             <div className="grid grid-cols-2 gap-2 mb-4">
                                 <button 

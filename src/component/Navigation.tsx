@@ -16,7 +16,7 @@ function Navigation() {
         {/* Logo */}
         <Link to="/" className="flex items-center space-x-2">
           <Bot className="w-7 h-7 text-green-600" />
-          <span className="text-xl font-bold text-gray-900">AI Launchpad</span>
+          <span className="text-xl font-bold text-gray-900">De-Gift.Agent</span>
         </Link>
 
         {/* Center nav links */}
