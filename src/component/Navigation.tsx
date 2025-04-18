@@ -39,6 +39,12 @@ function Navigation() {
           >
             Profile
           </Link>
+          <Link
+            to="/giftagent"
+            className="font-medium text-sm bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 hover:opacity-80"
+          >
+            Gift Agent
+          </Link>
         </div>
 
         {/* Right side */}

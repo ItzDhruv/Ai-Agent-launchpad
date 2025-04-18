@@ -4,6 +4,7 @@ import CreateAgentPage from './pages/CreateAgentPage';
 import ExplorePage from './pages/Explore';
 import HomePage from './pages/HomePage';
 import DashboardPage from './pages/DashboardPage';
+import GiftAgentPage from './pages/GiftAgent';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Route path="/create" element={<CreateAgentPage />} />
         <Route path="/chat/:agentId" element={<ChatPage />} />
         <Route path="/explore" element={<ExplorePage />} />
+        <Route path="/giftagent" element={<GiftAgentPage />} />
       </Routes>
     </Router>
   );
