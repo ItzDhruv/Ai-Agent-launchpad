@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Navigation from '../component/Navigation';
 import AgentCard from '../component/AgentCard';
+import toast, { Toaster } from 'react-hot-toast';
 
 interface Agent {
   id: string;
@@ -26,22 +27,47 @@ function GiftAgentPage() {
     setAgents(storedAgents);
   }, []);
 
+  const truncateAddress = (address: string) =>
+    address.length > 12 ? `${address.slice(0, 6)}...${address.slice(-4)}` : address;
+
   const handleSendGift = () => {
-    // TODO: Replace this with smart contract logic
-    console.log(`Sending agent "${selectedAgent?.name}" to ${recipient}`);
     setIsSent(true);
+
     setTimeout(() => {
+      toast.custom((t) => (
+        <div
+          className={`${
+            t.visible ? 'animate-enter' : 'animate-leave'
+          } max-w-md w-full bg-gradient-to-r from-fuchsia-600 via-violet-500 to-indigo-500 p-1 rounded-lg shadow-lg`}
+        >
+          <div className="bg-gray-900 text-white rounded-md p-4">
+            <div className="flex items-start">
+              <div className="text-2xl mr-3">🎁</div>
+              <div>
+                <p className="text-lg font-bold mb-1">Agent Gifted!</p>
+                <p className="text-sm text-gray-300">
+                  <strong>{selectedAgent?.name}</strong> sent to{' '}
+                  <span className="font-mono bg-gray-800 px-2 py-0.5 rounded">
+                    {truncateAddress(recipient)}
+                  </span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      ));
+
       setIsSent(false);
       setSelectedAgent(null);
       setRecipient('');
-    }, 2000);
+    }, 3000);
   };
 
   return (
     <>
       <Navigation />
+      <Toaster position="top-center" />
       <div className="p-6">
-        {/* Centered Title */}
         <h1 className="text-3xl font-bold text-center mb-6">🎁 Gift an Agent</h1>
 
         {agents.length === 0 ? (
@@ -57,7 +83,6 @@ function GiftAgentPage() {
         )}
       </div>
 
-      {/* Gift Modal */}
       {selectedAgent && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white rounded-xl p-6 w-96 shadow-xl">
@@ -72,10 +97,36 @@ function GiftAgentPage() {
             />
             <button
               onClick={handleSendGift}
-              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 w-full"
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 w-full flex justify-center items-center gap-2"
               disabled={!recipient || isSent}
             >
-              {isSent ? 'Sent ✅' : 'Send Gift'}
+              {isSent ? (
+                <>
+                  <svg
+                    className="animate-spin h-4 w-4 text-white"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8v8H4z"
+                    />
+                  </svg>
+                  Sending...
+                </>
+              ) : (
+                'Send Gift'
+              )}
             </button>
             <button
               onClick={() => setSelectedAgent(null)}

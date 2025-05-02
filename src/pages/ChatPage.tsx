@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate, useParams, Link } from 'react-router-dom';
 import { Bot, Send, ArrowLeft, TrendingUp, BarChart, Wallet, CreditCard, ArrowDownCircle, ArrowUpCircle, X } from 'lucide-react';
+import { callGemini } from '../utils/geminiApi'; // Import the Gemini API function
 
 interface Message {
     id: string;
@@ -118,6 +119,7 @@ function ChatPage() {
     const { agentId } = useParams();
     const [messages, setMessages] = React.useState<Message[]>([]);
     const [input, setInput] = React.useState('');
+    const [isLoading, setIsLoading] = React.useState(false); // Loading state for API calls
     const messagesEndRef = React.useRef<HTMLDivElement>(null);
     const agents = JSON.parse(localStorage.getItem('agents') || '[]') as Agent[];
     const agent = agents.find(a => a.id === agentId);
@@ -177,7 +179,7 @@ function ChatPage() {
         );
     }
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!input.trim()) return;
 
@@ -190,17 +192,46 @@ function ChatPage() {
 
         setMessages(prev => [...prev, userMessage]);
         setInput('');
+        setIsLoading(true); // Start loading state
 
-        // Simulate agent response
-        setTimeout(() => {
+        try {
+            // Create the prompt for Gemini by adding context about the agent
+            const prompt = `
+                You are ${agent.name}, a ${agent.role}.
+                Here are your instructions: ${agent.instructions}
+                
+                User message: ${input}
+                
+                Please respond in character as ${agent.name}.
+            `;
+            
+            // Call the Gemini API
+            const response = await callGemini(prompt);
+            
+            // Add the agent's response to the chat
             const agentMessage: Message = {
-                id: (Date.now() + 1).toString(),
-                content: `As ${agent.name}, I'm here to help with your request. Can you tell me more about what you need?`,
+                id: Date.now().toString(),
+                content: response,
                 sender: 'agent',
                 timestamp: Date.now(),
             };
+            
             setMessages(prev => [...prev, agentMessage]);
-        }, 1000);
+        } catch (error) {
+            console.error("Error calling Gemini API:", error);
+            
+            // Add an error message in case of API failure
+            const errorMessage: Message = {
+                id: Date.now().toString(),
+                content: "Sorry, I encountered an error while processing your request. Please try again later.",
+                sender: 'agent',
+                timestamp: Date.now(),
+            };
+            
+            setMessages(prev => [...prev, errorMessage]);
+        } finally {
+            setIsLoading(false); // End loading state
+        }
     };
     
     const openBuyModal = () => {
@@ -287,6 +318,20 @@ function ChatPage() {
                                     </div>
                                 ))
                             )}
+                            {isLoading && (
+                                <div className="flex justify-start mb-6">
+                                    <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center mr-3 flex-shrink-0">
+                                        <Bot className="w-4 h-4 text-indigo-600" />
+                                    </div>
+                                    <div className="bg-white text-gray-800 shadow-sm border border-gray-200 rounded-2xl rounded-tl-none p-4 max-w-[75%]">
+                                        <div className="flex items-center space-x-2">
+                                            <div className="w-2 h-2 bg-indigo-600 rounded-full animate-bounce"></div>
+                                            <div className="w-2 h-2 bg-indigo-600 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                                            <div className="w-2 h-2 bg-indigo-600 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
                             <div ref={messagesEndRef} />
                         </div>
                         
@@ -299,11 +344,12 @@ function ChatPage() {
                                     onChange={(e) => setInput(e.target.value)}
                                     placeholder="Type your message..."
                                     className="flex-1 px-4 py-3 rounded-full border-2 border-indigo-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all"
+                                    disabled={isLoading}
                                 />
                                 <button
                                     type="submit"
-                                    className="bg-indigo-600 text-white px-5 py-3 rounded-full hover:bg-indigo-700 transition-colors flex items-center justify-center shadow-md"
-                                    disabled={!input.trim()}
+                                    className="bg-indigo-600 text-white px-5 py-3 rounded-full hover:bg-indigo-700 transition-colors flex items-center justify-center shadow-md disabled:bg-indigo-400"
+                                    disabled={!input.trim() || isLoading}
                                 >
                                     <Send className="w-5 h-5" />
                                 </button>
@@ -348,7 +394,6 @@ function ChatPage() {
                                     ></div>
                                 ))}
                             </div>
-                            
                             
                             <div className="grid grid-cols-2 gap-2 mb-4">
                                 <button 
